@@ -1,0 +1,10 @@
+import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';
+import {plan,validActions} from '../web/engine.mjs';
+const lesson=JSON.parse(fs.readFileSync(new URL('../data/lesson.json',import.meta.url)));
+test('two explicit actions cite one verified source',()=>{const r=plan('Take me to the support guardrail and send to phone','intro',lesson);assert.deepEqual(r.actions.map(a=>a.tool),['seek','prepare_card']);assert.ok(r.actions.every(a=>a.start===80));assert.ok(validActions(r,lesson));});
+test('unrelated question has no action',()=>{assert.deepEqual(plan('Bake a cake at what temperature','intro',lesson).actions,[]);});
+test('context reference uses current source',()=>{assert.equal(plan('Explain this','uncertainty',lesson).actions[0].segment_id,'uncertainty');});
+test('negated jump does not seek',()=>{assert.deepEqual(plan('Do not jump just explain assignment','intro',lesson).actions.map(a=>a.tool),['explain']);});
+test('modified citation is rejected',()=>{const r=plan('explain assignment','intro',lesson);r.actions[0].text='invented claim';assert.equal(validActions(r,lesson),false);});
+test('extra repeated action is rejected',()=>{const r=plan('jump to assignment','intro',lesson);r.actions.push({...r.actions[0]});assert.equal(validActions(r,lesson),false);});
+test('unsupported action proposal is rejected',()=>{const r=plan('explain assignment','intro',lesson);r.actions[0].tool='purchase';assert.equal(validActions(r,lesson),false);});

@@ -1,0 +1,24 @@
+name: Verify CouchPilot
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ['3.11', '3.12', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: python -m unittest discover -s tests -v
+      - run: node --test tests/test_engine.mjs
+      - run: node --check web/app.mjs
+      - run: python scripts/verify_analytics.py
+      - run: python scripts/build_web.py
+      - run: git diff --exit-code -- web/lesson.js web/evidence.js
