@@ -25,6 +25,7 @@ V5 made 76 model calls across 38 tasks. Sixteen tasks were handled by determinis
 - Ambiguous requests offer explicit chapter choices. Selection prepares a new proposal and preserves the requested action type; execution still requires approval.
 - TV focus mode enlarges controls and moves focus spatially with arrow keys. Native text editing retains normal keyboard behavior. It is a browser layout, not a certified TV application.
 - The complete transcript is readable without watching the silent lesson. Reduced-motion and forced-colors styles remain supported.
+- Section links retain the exact document path, preventing a trailing-slash redirect from reloading the session during navigation.
 - Task IDs are independent of cancellation revisions. Undo is attributed to the task that initiated its jump, even if a subsequent request was cancelled.
 - The evidence explorer exposes historical runs, failures, categories and full recorded traces. Policy-only tasks are labeled separately from model latency.
 

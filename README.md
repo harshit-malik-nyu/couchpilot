@@ -6,7 +6,7 @@
 
 An independent work sample by Harshit Malik for consumer AI product work. No affiliation with Google or YouTube. One original two-minute visual lesson makes every source excerpt and timestamp inspectable. No scraped video or fabricated customer evidence.
 
-![Published CouchPilot experience](docs/live-demo.jpg)
+![Published CouchPilot experience](docs/upgrade-live.jpg)
 
 [Deployment verification](docs/VERIFICATION.md) records the browser checks and exact tested revision.
 
@@ -45,6 +45,7 @@ An independent work sample by Harshit Malik for consumer AI product work. No aff
 - **TV focus mode:** larger controls, visible focus, directional keyboard navigation, explicit play/pause and a complete readable transcript.
 - **Evidence explorer:** compare five measured model iterations, filter task categories/failures, and inspect traces including deterministic boundary decisions.
 - **Device layout lab:** inspect the actual page in 360, 768 and 1280 pixel browser viewports, plus the phone companion.
+- **Session-preserving navigation:** moving between the experience and evidence keeps playback, pending approval and filters intact.
 - **Trustworthy event attribution:** cancellation and undo retain the correct task identity; exports omit prompt and audio fields.
 - **48 automated tests** (29 Python, 19 JavaScript), source/report integrity gates, SQL reconciliation, and software decoding of all six shipped QR assets.
 
