@@ -90,3 +90,5 @@ Rebuild the original media with Pillow and ffmpeg using `python scripts/build_me
 ## Evidence boundaries
 
 No native YouTube integration, device/OEM launch, real customer research, production-scale serving, guaranteed privacy on shared TVs, measured adoption or revenue impact. The public card contains only original public content; it is shareable and has no expiry. The original lesson and transcripts are released under CC0-1.0; code is MIT. Third-party runtimes/models retain their own licenses and are not redistributed.
+
+The 54-case suite contains 53 unique request/context pairs: “Explain this part” at the uncertainty chapter appears once in the original suite and once in the expanded context sweep. Both recorded cases remain visible; they are not independent observations.

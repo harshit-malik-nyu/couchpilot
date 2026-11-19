@@ -35,3 +35,5 @@ The model files record Python, platform, Ollama version/model digest, hashes and
 
 ## Product decision
 Publish the transparent, reproducible work sample. Keep public interaction on the deterministic path and keep the local model optional. No incremental viewer value, ASR accuracy, native TV support, client adoption or production-scale serving has been established. A perfect observed score on these authored tasks is one bounded engineering result, not a universal product rating.
+
+The 54-case suite contains 53 unique request/context pairs: “Explain this part” at the uncertainty chapter appears once in the original suite and once in the expanded context sweep. Both recorded cases remain visible; they are not independent observations.
