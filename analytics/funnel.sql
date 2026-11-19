@@ -10,7 +10,7 @@ WITH tasks AS (
  FROM events GROUP BY session_id,request_id
 )
 SELECT SUM(initiated) initiated_tasks,
- SUM(initiated*ready) reviewed_proposals,
+ SUM(initiated*ready) ready_proposals,
  SUM(initiated*applied) applied_tasks,
  SUM(initiated*applied*(1-undone)) applied_not_undone,
  SUM(initiated*cancelled) cancelled_tasks

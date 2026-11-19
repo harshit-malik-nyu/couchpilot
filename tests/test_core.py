@@ -32,7 +32,8 @@ class CoreTests(unittest.TestCase):
         result=run('go to support',model)
         self.assertEqual(result['status'],'ready');self.assertEqual(result['actions'][0]['start'],80)
         self.assertEqual(result['actions'][0]['text'],SEGMENTS['guardrails']['text'])
-        self.assertEqual(len(result['trace']),3)
+        self.assertEqual(result['model_calls'],2)
+        self.assertTrue(result['trace'][-1]['accepted'])
     def test_model_failure_never_becomes_rules(self):
         class Bad:
             def call(self,*args):raise OSError('unavailable')
@@ -41,6 +42,26 @@ class CoreTests(unittest.TestCase):
         with self.assertRaises(ValueError):run('x'*501,None)
     def test_card_is_draft(self):self.assertEqual(rules('send second step to phone')['actions'][0]['tool'],'prepare_card')
     def test_no_jump_on_negation(self):self.assertNotIn('seek',[a['tool'] for a in rules('do not jump explain assignment')['actions']])
+    def test_card_only_bad_seek_repaired(self):
+        m=SequenceModel([{'query':'review'},{'action':'seek_card','segment_id':'review'},{'action':'card','segment_id':'review'}])
+        r=run('Save the final review for my phone',m)
+        self.assertEqual([a['tool'] for a in r['actions']],['prepare_card']);self.assertEqual(r['model_calls'],3)
+        self.assertTrue(any(t['tool']=='critic' and not t['accepted'] for t in r['trace']))
+    def test_repair_budget_fails_closed(self):
+        m=SequenceModel([{'query':'review'},{'action':'seek_card','segment_id':'review'},{'action':'seek_card','segment_id':'review'}])
+        r=run('Save final review for my phone',m)
+        self.assertEqual(r['status'],'error');self.assertEqual(r['actions'],[]);self.assertEqual(r['model_calls'],3)
+    def test_unrelated_input_uses_no_model(self):
+        r=run('What temperature for baking a cake?',None)
+        self.assertEqual(r['status'],'unsupported');self.assertEqual(r['model_calls'],0)
+    def test_unknown_source_repair_cannot_escape_boundary(self):
+        m=SequenceModel([{'query':'assignment'},{'action':'seek','segment_id':'review'},{'action':'seek','segment_id':'review'}])
+        self.assertEqual(run('jump to assignment',m)['status'],'error')
+    def test_robustness_rules(self):
+        from pathlib import Path
+        from couchpilot.evaluate import grade
+        for c in json.loads((Path(__file__).resolve().parents[1]/'evaluation/robustness-cases.json').read_text()):
+            with self.subTest(c['id']):self.assertTrue(grade(c,rules(c['query'],c['current']))['correct'])
     def test_single_use_handoff(self):
         p=Pairings();c=p.create('assignment');self.assertEqual(p.consume(c['code'])['id'],'assignment')
         with self.assertRaises(ValueError):p.consume(c['code'])
@@ -80,3 +101,15 @@ class HTTPTests(unittest.TestCase):
     def test_rebinding_host_rejected(self):
         with self.assertRaises(urllib.error.HTTPError) as ctx:self.post('/api/handoff',{'segment_id':'intro'},{'Host':'evil.example'})
         self.assertEqual(ctx.exception.code,403)
+    def test_non_origin_url_rejected(self):
+        with self.assertRaises(urllib.error.HTTPError) as ctx:self.post('/api/handoff',{'segment_id':'intro'},{'Origin':self.url+'/not-an-origin'})
+        self.assertEqual(ctx.exception.code,403)
+    def test_wrong_origin_scheme_rejected(self):
+        with self.assertRaises(urllib.error.HTTPError) as ctx:self.post('/api/handoff',{'segment_id':'intro'},{'Origin':self.url.replace('http:','https:')})
+        self.assertEqual(ctx.exception.code,403)
+    def test_oversized_body_rejected(self):
+        with self.assertRaises(urllib.error.HTTPError) as ctx:self.post('/api/agent',{'query':'x'*5000})
+        self.assertEqual(ctx.exception.code,400)
+    def test_unsupported_request_http_needs_no_model(self):
+        r=self.post('/api/agent',{'query':'Buy a television','current':'intro'})
+        self.assertEqual(r['status'],'unsupported');self.assertEqual(r['model_calls'],0)

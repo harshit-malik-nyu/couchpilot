@@ -14,7 +14,7 @@ def make_server(port=8787,model='qwen2.5:3b'):
         def log_message(self,*args):pass # Do not log prompts, tokens or paths.
         def valid_origin(self):
             allowed={f'localhost:{self.server.server_port}',f'127.0.0.1:{self.server.server_port}'}
-            return self.headers.get('Host') in allowed and (not self.headers.get('Origin') or urlsplit(self.headers['Origin']).netloc in allowed)
+            return self.headers.get('Host') in allowed and (not self.headers.get('Origin') or self.headers['Origin'] in {'http://'+host for host in allowed})
         def respond(self,status,obj):
             body=json.dumps(obj).encode();self.send_response(status);self.send_header('Content-Type','application/json');self.send_header('Cache-Control','no-store');self.send_header('Content-Length',str(len(body)));self.end_headers();self.wfile.write(body)
         def do_GET(self):

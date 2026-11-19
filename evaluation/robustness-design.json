@@ -1,0 +1,11 @@
+{
+  "scope": "Authored development acceptance suite. Written before v3 implementation; visible during development. Not independent or held-out.",
+  "cases_sha256": "eba24473162ca1673747be70be0f08f13e747fc023740de65e6c82f89f9bb5cb",
+  "count": 54,
+  "criteria": {
+    "exact_task_success": 1.0,
+    "wrong_seek_proposals": 0,
+    "unverified_source_actions": 0
+  },
+  "decision": "These are prototype engineering targets, not sufficient production launch criteria."
+}

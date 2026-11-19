@@ -1,5 +1,6 @@
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';
-import {plan,validActions} from '../web/engine.mjs';
+import {plan,validActions,ReviewSession} from '../web/engine.mjs';
+import {SessionLog} from '../web/events.mjs';
 const lesson=JSON.parse(fs.readFileSync(new URL('../data/lesson.json',import.meta.url)));
 test('two explicit actions cite one verified source',()=>{const r=plan('Take me to the support guardrail and send to phone','intro',lesson);assert.deepEqual(r.actions.map(a=>a.tool),['seek','prepare_card']);assert.ok(r.actions.every(a=>a.start===80));assert.ok(validActions(r,lesson));});
 test('unrelated question has no action',()=>{assert.deepEqual(plan('Bake a cake at what temperature','intro',lesson).actions,[]);});
@@ -8,3 +9,16 @@ test('negated jump does not seek',()=>{assert.deepEqual(plan('Do not jump just e
 test('modified citation is rejected',()=>{const r=plan('explain assignment','intro',lesson);r.actions[0].text='invented claim';assert.equal(validActions(r,lesson),false);});
 test('extra repeated action is rejected',()=>{const r=plan('jump to assignment','intro',lesson);r.actions.push({...r.actions[0]});assert.equal(validActions(r,lesson),false);});
 test('unsupported action proposal is rejected',()=>{const r=plan('explain assignment','intro',lesson);r.actions[0].tool='purchase';assert.equal(validActions(r,lesson),false);});
+const cases=JSON.parse(fs.readFileSync(new URL('../evaluation/robustness-cases.json',import.meta.url)));
+test('all authored robustness cases have exact browser results',()=>{for(const c of cases){const r=plan(c.query,c.current,lesson);assert.equal(r.status,c.status,c.id);assert.deepEqual(r.actions.map(a=>a.tool).sort(),[...c.tools].sort(),c.id);assert.ok(r.actions.every(a=>a.segment_id===c.segment),c.id);assert.ok(validActions(r,lesson,c.query),c.id);}});
+test('forged source title is rejected',()=>{const r=plan('explain assignment','intro',lesson);r.actions[0].title='forged';assert.equal(validActions(r,lesson),false);});
+test('mixed targets are rejected',()=>{const r=plan('jump to assignment and save a card','intro',lesson);r.actions[1]=plan('save review card','intro',lesson).actions[0];assert.equal(validActions(r,lesson),false);});
+test('extra seek on a card request is rejected',()=>{assert.equal(validActions(plan('jump to assignment and save a card','intro',lesson),lesson,'save assignment card'),false);});
+test('editing invalidates a ready proposal',()=>{const s=new ReviewSession(),id=s.begin('jump to assignment','intro');s.offer(id,plan('jump to assignment','intro',lesson),lesson);s.invalidate();assert.equal(s.approve('jump to review','intro',lesson),null);});
+test('late results after cancellation are discarded',()=>{const s=new ReviewSession(),id=s.begin('jump to assignment','intro');s.invalidate();assert.equal(s.offer(id,plan('jump to assignment','intro',lesson),lesson),false);});
+test('new request rejects the older response',()=>{const s=new ReviewSession(),id=s.begin('jump to assignment','intro');s.begin('jump to review','intro');assert.equal(s.offer(id,plan('jump to assignment','intro',lesson),lesson),false);});
+test('context changes require a new review',()=>{const s=new ReviewSession(),id=s.begin('explain this','intro');s.offer(id,plan('explain this','intro',lesson),lesson);assert.equal(s.approve('explain this','assignment',lesson),null);});
+test('approval is single use',()=>{const s=new ReviewSession(),id=s.begin('jump to assignment','intro');s.offer(id,plan('jump to assignment','intro',lesson),lesson);assert.equal(s.approve('jump to assignment','intro',lesson).length,1);assert.equal(s.approve('jump to assignment','intro',lesson),null);});
+test('null and extra-field actions fail closed',()=>{assert.equal(validActions({status:'ready',actions:[null]},lesson),false);const r=plan('jump to assignment','intro',lesson);r.actions[0].url='https://example.com';assert.equal(validActions(r,lesson),false);});
+test('undo remains attributed to the applied task after a new request',()=>{const l=new SessionLog('test',()=>1),first=l.start('rules');l.record('actions_applied');l.end();l.start('rules');l.record('request_cancelled');l.end();l.record('seek_undone',{},first);const e=JSON.parse(l.export());assert.equal(e.at(-1).request_id,first);assert.equal(e[3].request_id,2);});
+test('event export omits raw prompt and audio fields',()=>{const l=new SessionLog('test',()=>1);l.start('rules');l.record('proposal_ready',{prompt:'private',audio:'secret',segment:'intro'});const e=JSON.parse(l.export());assert.equal(e[1].prompt,undefined);assert.equal(e[1].audio,undefined);assert.equal(e[1].segment,'intro');});

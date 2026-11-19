@@ -1,0 +1,35 @@
+{
+  "scope": "Software decoding of SVG-rendered QR images at 600 pixels. No physical camera or phone compatibility claim.",
+  "results": [
+    {
+      "asset": "web/qr/intro.svg",
+      "sha256": "84ab93872d5be79ec2b8ab902fa5a619739c5cc03cbc120923305f49ea76b10e",
+      "decoded": "https://portfolio-lac-five-10.vercel.app/projects/couchpilot/companion.html#segment=intro"
+    },
+    {
+      "asset": "web/qr/denominator.svg",
+      "sha256": "0d4939b015a7e97ada87e963e61cc91fc912aa21938e491d9426c9d231687eed",
+      "decoded": "https://portfolio-lac-five-10.vercel.app/projects/couchpilot/companion.html#segment=denominator"
+    },
+    {
+      "asset": "web/qr/assignment.svg",
+      "sha256": "3e1dfd8b7a660cbffba163b80298073ab633a5ba75fa13dc615b040f02f57ecf",
+      "decoded": "https://portfolio-lac-five-10.vercel.app/projects/couchpilot/companion.html#segment=assignment"
+    },
+    {
+      "asset": "web/qr/uncertainty.svg",
+      "sha256": "f2824ef5fd294c49c1f87697b46c080e7be4645392861e91111c2dfc08788196",
+      "decoded": "https://portfolio-lac-five-10.vercel.app/projects/couchpilot/companion.html#segment=uncertainty"
+    },
+    {
+      "asset": "web/qr/guardrails.svg",
+      "sha256": "e7df7ddb57ee39000494fe0972d1874d178bfd284fb3294524aaa63d2a7c1e08",
+      "decoded": "https://portfolio-lac-five-10.vercel.app/projects/couchpilot/companion.html#segment=guardrails"
+    },
+    {
+      "asset": "web/qr/review.svg",
+      "sha256": "3a0e9c189e3de81e5ee339d263d62fafc17d8888c2bdf749777f0f5c46e6e29e",
+      "decoded": "https://portfolio-lac-five-10.vercel.app/projects/couchpilot/companion.html#segment=review"
+    }
+  ]
+}

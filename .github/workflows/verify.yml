@@ -20,5 +20,16 @@ jobs:
       - run: node --test tests/test_engine.mjs
       - run: node --check web/app.mjs
       - run: python scripts/verify_analytics.py
+      - run: python scripts/verify_reports.py
       - run: python scripts/build_web.py
       - run: git diff --exit-code -- web/lesson.js web/evidence.js
+  qr-assets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install zxing-cpp==2.3.0 cairosvg==2.8.2 pillow==11.3.0
+      - run: python scripts/verify_qr.py
+      - run: git diff --exit-code -- evaluation/qr-check.json
