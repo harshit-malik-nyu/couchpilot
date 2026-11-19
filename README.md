@@ -6,6 +6,10 @@
 
 An independent work sample by Harshit Malik for consumer AI product work. No affiliation with Google or YouTube. One original two-minute visual lesson makes every source excerpt and timestamp inspectable. No scraped video or fabricated customer evidence.
 
+![Published CouchPilot experience](docs/live-demo.jpg)
+
+[Deployment verification](docs/VERIFICATION.md) records the browser checks and exact tested revision.
+
 ## What works
 
 - Play an original silent lesson and navigate six chapters with keyboard or pointer.
